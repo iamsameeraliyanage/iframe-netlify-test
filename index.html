@@ -6,7 +6,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Netlify Site - Payment API</title>
    <meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; frame-src https://iamsameeraliyanage.github.io;">
+      content="default-src 'self'; script-src 'self' 'nonce-abc123'; frame-src https://iamsameeraliyanage.github.io;">
 </head>
 
 <body>
@@ -22,7 +22,7 @@
    <iframe id="github-iframe" src="https://iamsameeraliyanage.github.io/iframe-github-test" width="600" height="400"
       sandbox="allow-scripts allow-same-origin"></iframe>
 
-   <script>
+   <script nonce="abc123">
       const githubIframe = document.getElementById('github-iframe');
       const log = document.getElementById('log');
 
@@ -30,10 +30,8 @@
          if (event.origin === 'https://iframe-vercel-test.vercel.app') {
             logMessage(`Received from Vercel: ${JSON.stringify(event.data)}`);
 
-            // Forward request to GitHub iframe
             githubIframe.contentWindow.postMessage(event.data, 'https://iamsameeraliyanage.github.io');
          } else if (event.origin === 'https://iamsameeraliyanage.github.io') {
-            // Forward response from GitHub iframe to Vercel
             logMessage(`Received from GitHub: ${JSON.stringify(event.data)}`);
             window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
          } else {
