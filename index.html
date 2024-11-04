@@ -1,6 +1,34 @@
-<html>
-   <head></head>
-   <body>
-      <h1>Hello netlify test</h1>
-   </body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Netlify Site</title>
+</head>
+
+<body>
+   <h1>Netlify Site</h1>
+   <iframe id="github-iframe" src="https://iamsameeraliyanage.github.io/iframe-github-test" width="600"
+      height="400"></iframe>
+
+   <script>
+
+      const githubIframe = document.getElementById('github-iframe');
+
+      window.addEventListener('message', (event) => {
+         if (event.origin === 'https://iframe-vercel-test.vercel.app') {
+            if (event.data.action === 'request-data') {
+               // Relay message to GitHub iframe
+               githubIframe.contentWindow.postMessage({ action: 'send-data' }, 'https://iamsameeraliyanage.github.io');
+            }
+         } else if (event.origin === 'https://iamsameeraliyanage.github.io') {
+            // Send data back to Vercel site
+            window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
+         }
+      });
+
+   </script>
+</body>
+
 </html>
