@@ -5,26 +5,44 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Netlify Site</title>
+   <!-- CSP restricting iframe source -->
+   <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; frame-src https://iamsameeraliyanage.github.io;">
 </head>
 
 <body>
    <h1>Netlify Site</h1>
-   <iframe id="github-iframe" src="https://iamsameeraliyanage.github.io/iframe-github-test" width="600"
-      height="400"></iframe>
+
+   <!-- GitHub iframe with sandbox to limit permissions -->
+   <iframe id="github-iframe" src="https://iamsameeraliyanage.github.io/iframe-github-test" width="600" height="400"
+      sandbox="allow-scripts allow-same-origin"></iframe>
 
    <script>
-
       const githubIframe = document.getElementById('github-iframe');
 
       window.addEventListener('message', (event) => {
+         // Verify origin to ensure message is from the trusted Vercel site
          if (event.origin === 'https://iframe-vercel-test.vercel.app') {
             if (event.data.action === 'request-data') {
-               // Relay message to GitHub iframe
-               githubIframe.contentWindow.postMessage({ action: 'send-data' }, 'https://iamsameeraliyanage.github.io');
+               try {
+                  // Relay message to GitHub iframe with specified target origin
+                  githubIframe.contentWindow.postMessage(
+                     { action: 'send-data' },
+                     'https://iamsameeraliyanage.github.io'
+                  );
+               } catch (error) {
+                  console.error("Failed to send message to GitHub iframe:", error);
+               }
             }
          } else if (event.origin === 'https://iamsameeraliyanage.github.io') {
-            // Send data back to Vercel site
-            window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
+            // Relay data received from GitHub iframe back to Vercel site
+            try {
+               window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
+            } catch (error) {
+               console.error("Failed to send message back to Vercel site:", error);
+            }
+         } else {
+            console.warn("Untrusted message origin:", event.origin);
          }
       });
 
