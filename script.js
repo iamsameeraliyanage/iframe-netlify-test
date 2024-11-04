@@ -1,4 +1,5 @@
 const githubIframe = document.getElementById('github-iframe');
+const communicationLog = document.getElementById('communication-log');
 
 window.addEventListener('message', (event) => {
     if (event.origin === 'https://iframe-vercel-test.vercel.app') {
@@ -6,7 +7,7 @@ window.addEventListener('message', (event) => {
             const paymentData = event.data.data;
 
             // Log the received payment data
-            console.log('Received payment data:', paymentData);
+            communicationLog.innerHTML += `<br>Netlify: Request data from Bank: ${JSON.stringify(paymentData)}`;
 
             // Relay message to GitHub iframe with the payment data
             try {
@@ -26,6 +27,9 @@ window.addEventListener('message', (event) => {
 // Listen for messages from GitHub iframe
 window.addEventListener('message', (event) => {
     if (event.origin === 'https://iamsameeraliyanage.github.io') {
+        // Log the bank response received
+        communicationLog.innerHTML += `<br>Netlify: Bank response received: ${JSON.stringify(event.data)}`;
+
         // Relay payment status back to Vercel site
         try {
             window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
