@@ -4,48 +4,48 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Netlify Site</title>
-   <!-- CSP restricting iframe source -->
+   <title>Netlify Site - Payment API</title>
    <meta http-equiv="Content-Security-Policy"
       content="default-src 'self'; frame-src https://iamsameeraliyanage.github.io;">
 </head>
 
 <body>
-   <h1>Netlify Site</h1>
+   <h1>Netlify Site - Payment API</h1>
 
-   <!-- GitHub iframe with sandbox to limit permissions -->
+   <!-- Communication Log -->
+   <div id="communication-log">
+      <h3>Communication Log:</h3>
+      <ul id="log"></ul>
+   </div>
+
+   <!-- GitHub iframe for Bank API -->
    <iframe id="github-iframe" src="https://iamsameeraliyanage.github.io/iframe-github-test" width="600" height="400"
       sandbox="allow-scripts allow-same-origin"></iframe>
 
    <script>
       const githubIframe = document.getElementById('github-iframe');
+      const log = document.getElementById('log');
 
       window.addEventListener('message', (event) => {
-         // Verify origin to ensure message is from the trusted Vercel site
          if (event.origin === 'https://iframe-vercel-test.vercel.app') {
-            if (event.data.action === 'request-data') {
-               try {
-                  // Relay message to GitHub iframe with specified target origin
-                  githubIframe.contentWindow.postMessage(
-                     { action: 'send-data' },
-                     'https://iamsameeraliyanage.github.io'
-                  );
-               } catch (error) {
-                  console.error("Failed to send message to GitHub iframe:", error);
-               }
-            }
+            logMessage(`Received from Vercel: ${JSON.stringify(event.data)}`);
+
+            // Forward request to GitHub iframe
+            githubIframe.contentWindow.postMessage(event.data, 'https://iamsameeraliyanage.github.io');
          } else if (event.origin === 'https://iamsameeraliyanage.github.io') {
-            // Relay data received from GitHub iframe back to Vercel site
-            try {
-               window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
-            } catch (error) {
-               console.error("Failed to send message back to Vercel site:", error);
-            }
+            // Forward response from GitHub iframe to Vercel
+            logMessage(`Received from GitHub: ${JSON.stringify(event.data)}`);
+            window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
          } else {
             console.warn("Untrusted message origin:", event.origin);
          }
       });
 
+      function logMessage(message) {
+         const item = document.createElement('li');
+         item.textContent = message;
+         log.appendChild(item);
+      }
    </script>
 </body>
 
