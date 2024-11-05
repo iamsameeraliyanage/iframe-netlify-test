@@ -9,15 +9,17 @@ window.addEventListener('message', (event) => {
             // Log the received payment data
             communicationLog.innerHTML += `<br>Netlify: Request data from Bank: ${JSON.stringify(paymentData)}`;
 
-            // Relay message to GitHub iframe with the payment data
-            try {
-                githubIframe.contentWindow.postMessage(
-                    { action: 'process-payment', data: paymentData }, 
-                    'https://iamsameeraliyanage.github.io'
-                );
-            } catch (error) {
-                console.error("Failed to send message to GitHub iframe:", error);
-            }
+            // Relay message to GitHub iframe with the payment data after 5 seconds
+            setTimeout(() => {
+                try {
+                    githubIframe.contentWindow.postMessage(
+                        { action: 'process-payment', data: paymentData }, 
+                        'https://iamsameeraliyanage.github.io'
+                    );
+                } catch (error) {
+                    console.error("Failed to send message to GitHub iframe:", error);
+                }
+            }, 5000);
         }
     } else {
         console.warn("Untrusted message origin:", event.origin);
@@ -27,15 +29,17 @@ window.addEventListener('message', (event) => {
 // Listen for messages from GitHub iframe
 window.addEventListener('message', (event) => {
     if (event.origin === 'https://iamsameeraliyanage.github.io') {
-        // Log the bank response received
-        communicationLog.innerHTML += `<br>Netlify: Bank response received: ${JSON.stringify(event.data)}`;
+        // Log the bank response received after 5 seconds
+        setTimeout(() => {
+            communicationLog.innerHTML += `<br>Netlify: Bank response received: ${JSON.stringify(event.data)}`;
 
-        // Relay payment status back to Vercel site
-        try {
-            window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
-        } catch (error) {
-            console.error("Failed to send message back to Vercel site:", error);
-        }
+            // Relay payment status back to Vercel site
+            try {
+                window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
+            } catch (error) {
+                console.error("Failed to send message back to Vercel site:", error);
+            }
+        }, 5000);
     } else {
         console.warn("Untrusted message origin:", event.origin);
     }
