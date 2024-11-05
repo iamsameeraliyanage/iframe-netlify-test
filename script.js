@@ -30,9 +30,8 @@ window.addEventListener('message', (event) => {
 window.addEventListener('message', (event) => {
     if (event.origin === 'https://iamsameeraliyanage.github.io') {
         // Log the bank response received after 5 seconds
-        setTimeout(() => {
-            communicationLog.innerHTML += `<br>Netlify: Bank response received: ${JSON.stringify(event.data)}`;
-
+        communicationLog.innerHTML += `<br>Netlify: Bank response received: ${JSON.stringify(event.data)}`;
+        setTimeout(() => { 
             // Relay payment status back to Vercel site
             try {
                 window.parent.postMessage(event.data, 'https://iframe-vercel-test.vercel.app');
